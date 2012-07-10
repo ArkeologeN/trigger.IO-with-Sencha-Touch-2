@@ -1,2 +1,2 @@
-trigger.IO---Sencha-Touch-2
+trigger.IO & Sencha-Touch-2
 ===========================
