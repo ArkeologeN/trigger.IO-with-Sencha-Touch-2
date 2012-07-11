@@ -30,7 +30,7 @@ Ext.define("OnNotes.controller.Notes",{
         var noteId = (now.getTime()).toString() + (this.getRandomInt(0,100)).toString();
         
         var newNote = Ext.create("OnNotes.model.Note", {
-            id: "noteId",
+            id: noteId,
             dateCreated: now,
             title: "",
             narrative: ""
@@ -42,7 +42,6 @@ Ext.define("OnNotes.controller.Notes",{
         this.activateNoteEditor(record);
     },
     onSaveNoteCommand: function() {
-        console.log("onSaveNoteCommand");
         var noteEditor = this.getNoteEditor();
 
         var currentNote = noteEditor.getRecord();
@@ -68,16 +67,22 @@ Ext.define("OnNotes.controller.Notes",{
 
         notesStore.sync();
 
-        notesStore.sort([{ property: 'dateCreated', direction: 'DESC'}]);
+        notesStore.sort([{property: 'dateCreated', direction: 'DESC'}]);
 
         this.activateNoteList();
         
     },
     onBackNoteCommand: function() {
-        window.history.back();
+        this.activateNoteList();
     },
     onDeleteNoteCommand: function() {
-        console.log("onDeleteNoteCommand fired.");
+        var noteEditor = this.getNoteEditor();
+        var currNote   = noteEditor.getRecord();
+        var noteStore  = Ext.getStore("Notes");
+        
+        noteStore.remove(currNote);
+        noteStore.sync();
+        this.activateNoteList();
     },
     launch: function() {
         this.callParent(arguments);
@@ -88,8 +93,8 @@ Ext.define("OnNotes.controller.Notes",{
         this.callParent(arguments);
         console.log("init")
     },
-    getRandomInt: function(min,max) {
-        return Math.floor(Math.random() * (min - max + 1)) + min;
+    getRandomInt: function (min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
     },
     activateNoteEditor: function(record) {
         var noteEditor = this.getNoteEditor();

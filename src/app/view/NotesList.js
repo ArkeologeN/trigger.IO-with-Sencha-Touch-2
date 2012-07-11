@@ -12,6 +12,7 @@ Ext.define("OnNotes.view.NotesList", {
         loadingText: "Loading your Notes!..",
         emptyText:   '<pre><div class="no-new-note-found">No Note Found yet!</div></pre>',
         onItemDisclosure: true,
+        grouped: true,
         itemTpl: '<pre><div class="item-title">{title}</div><div class="item-narrative">{narrative}</div></pre>'
     }
 });
