@@ -7,8 +7,14 @@
 
 Ext.define("OnNotes.store.Notes", {
     extend: "Ext.data.Store",
+    requires: ["Ext.data.proxy.LocalStorage"],
     config: {
         model: "OnNotes.model.Note",
+        proxy: {
+            type: "localstorage",
+            id:   "notes-app-store"
+        },
+        /*
         data: [
             { title: "Note 1", narrative: "narrative 1"},
             { title: "Note 2", narrative: "narrative 2"},
@@ -18,7 +24,7 @@ Ext.define("OnNotes.store.Notes", {
             { title: "Note 6", narrative: "narrative 6"},
             { title: "Note 7", narrative: "narrative 7"},
             
-        ],
+        ],*/
         sorter: [{property: "dateCreated", direction: "DESC"}]
     }
 });

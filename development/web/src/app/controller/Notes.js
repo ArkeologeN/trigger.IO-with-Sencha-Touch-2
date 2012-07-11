@@ -16,12 +16,16 @@ Ext.define("OnNotes.controller.Notes",{
             notesListContainer: {
                 newNoteCommand: "onNewNoteCommand",
                 editNoteCommand: "onEditNoteCommand"
+            },
+            noteEditor: {                
+                saveNoteCommand:    "onSaveNoteCommand",
+                deleteNoteCommand:  "onDeleteNoteCommand",
+                backNoteCommand:    "onBackNoteCommand"
             }
         }
     },
     
     onNewNoteCommand: function() {
-        console.log("onNewNoteCommand");
         var now = new Date();
         var noteId = (now.getTime()).toString() + (this.getRandomInt(0,100)).toString();
         
@@ -35,16 +39,54 @@ Ext.define("OnNotes.controller.Notes",{
         this.activateNoteEditor(newNote);
     },
     onEditNoteCommand: function(list,record) {
-        this.activateNodeEditor(record);
+        this.activateNoteEditor(record);
+    },
+    onSaveNoteCommand: function() {
+        console.log("onSaveNoteCommand");
+        var noteEditor = this.getNoteEditor();
+
+        var currentNote = noteEditor.getRecord();
+        var newValues = noteEditor.getValues();
+
+        // Update the current note's fields with form values.
+        currentNote.set("title", newValues.title);
+        currentNote.set("narrative", newValues.narrative);
+
+        var errors = currentNote.validate();
+
+        if (!errors.isValid()) {
+            Ext.Msg.alert('Wait!', errors.getByField("title")[0].getMessage(), Ext.emptyFn);
+            currentNote.reject();
+            return;
+        }
+
+        var notesStore = Ext.getStore("Notes");
+
+        if (null == notesStore.findRecord('id', currentNote.data.id)) {
+            notesStore.add(currentNote);
+        }
+
+        notesStore.sync();
+
+        notesStore.sort([{ property: 'dateCreated', direction: 'DESC'}]);
+
+        this.activateNoteList();
+        
+    },
+    onBackNoteCommand: function() {
+        window.history.back();
+    },
+    onDeleteNoteCommand: function() {
+        console.log("onDeleteNoteCommand fired.");
     },
     launch: function() {
         this.callParent(arguments);
         Ext.getStore('Notes').load();
-        console.log("Launch");
+        console.log("launch")
     },
     init: function() {
         this.callParent(arguments);
-        console.log("Init");
+        console.log("init")
     },
     getRandomInt: function(min,max) {
         return Math.floor(Math.random() * (min - max + 1)) + min;
@@ -55,5 +97,9 @@ Ext.define("OnNotes.controller.Notes",{
         noteEditor.setRecord(record);
         Ext.Viewport.animateActiveItem(noteEditor,this.slideLeftTransition);
     },
-    slideLeftTransition: {type: "slide", direction: "left"}
+    activateNoteList: function() {
+        Ext.Viewport.animateActiveItem(this.getNotesListContainer(),this.slideRightTransition);
+    },
+    slideLeftTransition: {type: "slide", direction: "left"},
+    slideRightTransition: {type: 'slide', direction: 'right'}
 });

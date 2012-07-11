@@ -18,8 +18,9 @@ Ext.define("OnNotes.controller.Notes",{
                 editNoteCommand: "onEditNoteCommand"
             },
             noteEditor: {                
-                saveNoteCommand: "onSaveNoteCommand",
-                backNoteCommand: "onBackNoteCommand"
+                saveNoteCommand:    "onSaveNoteCommand",
+                deleteNoteCommand:  "onDeleteNoteCommand",
+                backNoteCommand:    "onBackNoteCommand"
             }
         }
     },
@@ -41,14 +42,42 @@ Ext.define("OnNotes.controller.Notes",{
         this.activateNoteEditor(record);
     },
     onSaveNoteCommand: function() {
-        alert("works");
-        return false;
+        console.log("onSaveNoteCommand");
         var noteEditor = this.getNoteEditor();
-        console.log(noteEditor);
+
+        var currentNote = noteEditor.getRecord();
+        var newValues = noteEditor.getValues();
+
+        // Update the current note's fields with form values.
+        currentNote.set("title", newValues.title);
+        currentNote.set("narrative", newValues.narrative);
+
+        var errors = currentNote.validate();
+
+        if (!errors.isValid()) {
+            Ext.Msg.alert('Wait!', errors.getByField("title")[0].getMessage(), Ext.emptyFn);
+            currentNote.reject();
+            return;
+        }
+
+        var notesStore = Ext.getStore("Notes");
+
+        if (null == notesStore.findRecord('id', currentNote.data.id)) {
+            notesStore.add(currentNote);
+        }
+
+        notesStore.sync();
+
+        notesStore.sort([{ property: 'dateCreated', direction: 'DESC'}]);
+
+        this.activateNoteList();
         
     },
     onBackNoteCommand: function() {
         window.history.back();
+    },
+    onDeleteNoteCommand: function() {
+        console.log("onDeleteNoteCommand fired.");
     },
     launch: function() {
         this.callParent(arguments);
@@ -69,7 +98,7 @@ Ext.define("OnNotes.controller.Notes",{
         Ext.Viewport.animateActiveItem(noteEditor,this.slideLeftTransition);
     },
     activateNoteList: function() {
-        Ext.Viewport.animateActiveItem(this.getNodesListContainer(),this.slideRightTransition);
+        Ext.Viewport.animateActiveItem(this.getNotesListContainer(),this.slideRightTransition);
     },
     slideLeftTransition: {type: "slide", direction: "left"},
     slideRightTransition: {type: 'slide', direction: 'right'}

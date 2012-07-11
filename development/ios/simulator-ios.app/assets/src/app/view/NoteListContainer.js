@@ -43,11 +43,9 @@ Ext.define("OnNotes.view.NoteListContainer", {
         this.add([topToolbar,noteList]);
     },
     onNewButtonTap: function() {
-        console.log("newNoteCommand");
         this.fireEvent("newNoteCommand",this);
     },
     onNoteListDisclose: function(list,record,target,index,evt,options) {
-        console.log("editNoteCommand");
         this.fireEvent("editNoteCommand",this,record);
     },
     config: {

@@ -18,13 +18,17 @@ Ext.define("OnNotes.view.NoteEditor", {
         var backButton = {
             xtype:  "button",
             ui:     "back",
-            text:   "Home"
+            text:   "Home",
+            scope:  this,
+            handler: this.onBackButtonTap
         };
         
         var saveButton = {
             xtype: "button",
             ui:    "action",
-            text:  "Save"
+            text:  "Save",
+            scope: this,
+            handler: this.onSaveButtonTap
         };
         
         var topToolbar = {
@@ -42,7 +46,8 @@ Ext.define("OnNotes.view.NoteEditor", {
             xtype: "button",
             iconCls: "trash",
             iconMask: true,
-            scope:  this
+            scope:  this,
+            handler: this.onDeleteButtonTap
         }
         
         var bottomToolbar = {
@@ -72,5 +77,15 @@ Ext.define("OnNotes.view.NoteEditor", {
                     items: [noteTitleEditor,noteNarrativeEditor]},
             bottomToolbar
         ]);
+    },
+    onSaveButtonTap: function() {
+        console.log("onSave");
+        this.fireEvent("saveNoteCommand",this);
+    },
+    onBackButtonTap: function() {
+        this.fireEvent("backNoteCommand",this);
+    },
+    onDeleteButtonTap: function () {
+        this.fireEvent("deleteNoteCommand",this);
     }
 });
